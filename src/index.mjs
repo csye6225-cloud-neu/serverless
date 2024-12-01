@@ -1,8 +1,15 @@
 import mail from "@sendgrid/mail";
+import { SecretsManager, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 
-mail.setApiKey(process.env.SENDGRID_API_KEY);
+const secretsManager = new SecretsManager({ region: "us-east-1" });
 
 export const handler = async (event) => {
+	const secret_name = "sendgrid_api_key";
+
+	// Fetch the sendgrid API key from Secrets Manager
+	const apiKey = await getSecretValue(secret_name);
+	mail.setApiKey(apiKey);
+
 	for (const record of event.Records) {
 		const message = JSON.parse(record.Sns.Message);
 		const { email, token } = message;
@@ -28,5 +35,15 @@ async function sendVerificationEmail(to, link) {
 	} catch (error) {
 		console.error("Error sending email:", error);
 		return "bad request";
+	}
+}
+
+async function getSecretValue(secret_name) {
+	try {
+		const data = await secretsManager.send(new GetSecretValueCommand({ SecretId: secret_name, VersionStage: "AWSCURRENT" }));
+		return data.SecretString;
+	} catch (err) {
+		console.error("Error retrieving secret:", err);
+		throw new Error("Could not retrieve secret");
 	}
 }
