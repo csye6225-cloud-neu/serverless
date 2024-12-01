@@ -7,7 +7,7 @@ export const handler = async (event) => {
 	const secret_name = "sendgrid_api_key";
 
 	// Fetch the sendgrid API key from Secrets Manager
-	const apiKey = await getSecretValue(secret_name);
+	const apiKey = (await getSecretValue(secret_name)).apikey;
 	mail.setApiKey(apiKey);
 
 	for (const record of event.Records) {
@@ -41,7 +41,7 @@ async function sendVerificationEmail(to, link) {
 async function getSecretValue(secret_name) {
 	try {
 		const data = await secretsManager.send(new GetSecretValueCommand({ SecretId: secret_name, VersionStage: "AWSCURRENT" }));
-		return data.SecretString;
+		return JSON.parse(data.SecretString);
 	} catch (err) {
 		console.error("Error retrieving secret:", err);
 		throw new Error("Could not retrieve secret");
