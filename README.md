@@ -25,6 +25,5 @@ npm install
 3. Deploy the Lambda function in the /src folder using your preferred deployment method and set your credentials in the Environment Variables under Configuration:
 ```
 EMAIL_FROM=your-email@example.com
-SENDGRID_API_KEY=your-sendgrid-api-key
 DOMAIN=your-domain.com
 ```
