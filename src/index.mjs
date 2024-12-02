@@ -13,7 +13,7 @@ export const handler = async (event) => {
 	for (const record of event.Records) {
 		const message = JSON.parse(record.Sns.Message);
 		const { email, token } = message;
-		const verificationLink = `${process.env.DOMAIN}/verify?token=${token}`;
+		const verificationLink = `https://${process.env.DOMAIN}/verify?token=${token}`;
 
 		// Send the email
 		await sendVerificationEmail(email, verificationLink);
